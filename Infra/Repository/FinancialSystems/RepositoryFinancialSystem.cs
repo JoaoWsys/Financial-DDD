@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Infra.Repository.FinancialSystems
 {
-    public class RepositoryFinancialSystemUsers : RepositoryGenerics<FinancialSystem>, InterfaceFinancialSystem
+    public class RepositoryFinancialSystem : RepositoryGenerics<FinancialSystem>, InterfaceFinancialSystem
     {
         public Task<IList<FinancialSystem>> ListUserSystems(string userEmail)
         {
