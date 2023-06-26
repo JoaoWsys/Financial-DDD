@@ -1,6 +1,8 @@
 ﻿using Domain.Interfaces.IFinancialSystemUser;
 using Entities.Entities;
+using Infra.Configuration;
 using Infra.Repository.Generics;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,19 +13,42 @@ namespace Infra.Repository.FinancialSystems
 {
     public class RepositoryFinancialSystemUser : RepositoryGenerics<FinancialSystemUser>, InterfaceFinancialSystemUser
     {
-        public Task<FinancialSystemUser> GetUserByEmail(string userEmail)
+        private readonly DbContextOptions<ContextBase> _OptionsBuilder;
+
+        public RepositoryFinancialSystemUser()
         {
-            throw new NotImplementedException();
+            _OptionsBuilder = new DbContextOptions<ContextBase>();
+        }
+        public async Task<FinancialSystemUser> GetUserByEmail(string userEmail)
+        {
+            using (var database = new ContextBase(_OptionsBuilder))
+            {
+                return await
+                   database.FinancialSystemUser.AsNoTracking().
+                   FirstOrDefaultAsync(x => x.UserEmail.Equals(userEmail));
+            }
         }
 
-        public Task<IList<FinancialSystemUser>> ListSystemsUsers(int systemId)
+        public async Task<IList<FinancialSystemUser>> ListSystemsUsers(int systemId)
         {
-            throw new NotImplementedException();
+            using (var database = new ContextBase(_OptionsBuilder))
+            {
+                return await
+                   database.FinancialSystemUser
+                   .Where(s => s.SystemId == systemId).AsNoTracking()
+                   .ToListAsync();
+            }
         }
 
-        public Task RemoveUsers(List<FinancialSystemUser> users)
+        public async Task RemoveUsers(List<FinancialSystemUser> users)
         {
-            throw new NotImplementedException();
+            using (var database = new ContextBase(_OptionsBuilder))
+            {
+                database.FinancialSystemUser
+                    .RemoveRange(users);
+
+                await database.SaveChangesAsync();
+            }
         }
     }
 }
