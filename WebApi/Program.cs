@@ -3,6 +3,8 @@ using Domain.Interfaces.ICategory;
 using Domain.Interfaces.IExpense;
 using Domain.Interfaces.IFinancialSystem;
 using Domain.Interfaces.IFinancialSystemUser;
+using Domain.Interfaces.IServices;
+using Domain.Services;
 using Entities.Entities;
 using Infra.Configuration;
 using Infra.Repository.Categories;
@@ -31,6 +33,13 @@ builder.Services.AddSingleton<InterfaceCategory, RepositoryCategory>();
 builder.Services.AddSingleton<InterfaceExpense, RepositoryExpense>();
 builder.Services.AddSingleton<InterfaceFinancialSystem, RepositoryFinancialSystem>();
 builder.Services.AddSingleton<InterfaceFinancialSystemUser, RepositoryFinancialSystemUser>();
+
+
+builder.Services.AddSingleton<ICategoryService, CategoryService>();
+builder.Services.AddSingleton<IExpenseService, ExpenseService>();
+builder.Services.AddSingleton<IFinancialSystemService, FinancialSystemService>();
+builder.Services.AddSingleton<IFinancialSystemUserService, FinancialSystemUserService>();
+
 
 var app = builder.Build();
 
