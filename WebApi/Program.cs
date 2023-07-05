@@ -11,7 +11,10 @@ using Infra.Repository.Categories;
 using Infra.Repository.Expenses;
 using Infra.Repository.FinancialSystems;
 using Infra.Repository.Generics;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using WebApi.Token;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +44,38 @@ builder.Services.AddSingleton<IFinancialSystemService, FinancialSystemService>()
 builder.Services.AddSingleton<IFinancialSystemUserService, FinancialSystemUserService>();
 
 
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(option =>
+    {
+        option.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+
+            ValidIssuer = "Teste.Security.Bearer",
+            ValidAudience = "Teste.Security.Bearer",
+            IssuerSigningKey = JwtSecurityKey.Create("Secret_Key-12345678")
+        };
+
+        option.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = context =>
+            {
+                Console.WriteLine("OnAuthenticationFailed: " + context.Exception.Message);
+                return Task.CompletedTask;
+            }
+            ,
+            OnTokenValidated = context =>
+            {
+                Console.WriteLine("OnTokenValidated: " + context.SecurityToken);
+                return Task.CompletedTask;
+            }
+        };
+    });
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -51,6 +86,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
